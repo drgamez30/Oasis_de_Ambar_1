@@ -1,0 +1,8 @@
+# Imágenes de la versión anterior que ya no usa el sitio
+assets/img/emblema.png
+assets/img/logo-completo.png
+
+# Archivos del sistema
+Thumbs.db
+desktop.ini
+.DS_Store

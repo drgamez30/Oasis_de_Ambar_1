@@ -1,0 +1,10 @@
+Aquí van las fotos de los perfumes.
+
+Recomendaciones:
+- Formato .webp o .jpg, proporción vertical 4:5 (por ejemplo 800 x 1000 px).
+- Fondo negro o muy oscuro para que combinen con el diseño del catálogo.
+- Peso ideal menor a 200 KB por foto para que la página cargue rápido.
+- Nombre en minúsculas, sin tildes ni espacios, usando la referencia:
+  oa-001.webp, oa-002.webp ...
+- Luego, en assets/js/productos.js cambia la imagen del perfume:
+  imagen: "assets/img/productos/oa-001.webp"
