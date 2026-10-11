@@ -14,6 +14,10 @@ Oasis de Ambar/
 ├── sitemap.xml                 Mapa del sitio para buscadores
 ├── site.webmanifest            Nombre, colores e iconos del sitio
 ├── README.md                   Este archivo
+├── .github/workflows/
+│   └── publicar.yml            Publica el sitio en GitHub Pages con cada cambio
+├── scripts/
+│   └── generar-fotos.js        Arma la lista de fotos del catálogo
 └── assets/
     ├── css/
     │   └── styles.css          Diseño esmeralda y ámbar, animaciones, celular y tablet
@@ -21,6 +25,7 @@ Oasis de Ambar/
     ├── js/
     │   ├── config.js           Datos del negocio: WhatsApp, Instagram, dominio
     │   ├── productos.js        Estilos, familias, características y perfumes
+    │   ├── fotos.js            Lista de fotos (se genera sola, no está en el repositorio)
     │   ├── whatsapp.js         Plantillas de los mensajes de WhatsApp
     │   ├── catalogo.js         Filtros, buscador guiado, tarjetas, ficha y SEO
     │   └── animaciones.js      Animaciones al hacer scroll
@@ -36,6 +41,21 @@ Oasis de Ambar/
         ├── placeholder.svg     Imagen temporal mientras no haya fotos
         └── productos/          Fotos de los perfumes
 ```
+
+## Fotos automáticas
+
+Cada foto que se sube a `assets/img/productos/` aparece sola en el catálogo, uno o dos minutos después.
+
+| Quiero...                                  | Qué hago                 |
+|--------------------------------------------|--------------------------|
+| Agregar un perfume                         | Subo su foto. El nombre del archivo es el nombre del perfume |
+| Quitar un perfume                          | Borro su foto            |
+| Completar la ficha (estilo, familia, notas, barras) | Agrego el perfume en `productos.js` con el mismo nombre; la foto se le asigna sola |
+
+Al subir un cambio, GitHub ejecuta `.github/workflows/publicar.yml`, que arma la lista de fotos y publica el sitio.
+Para que funcione, en GitHub debe estar elegido **Settings → Pages → Source: GitHub Actions**.
+
+Para ver las fotos nuevas en tu computador antes de subirlas: `node scripts/generar-fotos.js`.
 
 ## Cómo se usa
 

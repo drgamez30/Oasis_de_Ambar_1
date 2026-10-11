@@ -1,10 +1,14 @@
 Aquí van las fotos de los perfumes.
 
+Cada foto que subas a esta carpeta aparece sola en el catálogo, uno o dos minutos después de subirla.
+
+- El nombre del archivo es el nombre del perfume: "Ishq Al Shuyukh Gold.jpg" se muestra como "Ishq Al Shuyukh Gold".
+  Los guiones también cuentan como espacios: "khamrah-qahwa.webp" se muestra como "Khamrah Qahwa".
+- Si borras la foto, el perfume sale del catálogo.
+- Para ponerle estilo, familia, notas y barras, agrega el perfume en assets/js/productos.js con el mismo nombre.
+  La foto se le asigna sola; no hace falta escribir la ruta de la imagen.
+
 Recomendaciones:
 - Formato .webp o .jpg, proporción vertical 4:5 (por ejemplo 800 x 1000 px).
 - Fondo negro o muy oscuro para que combinen con el diseño del catálogo.
 - Peso ideal menor a 200 KB por foto para que la página cargue rápido.
-- Nombre en minúsculas, sin tildes ni espacios, usando la referencia:
-  oa-001.webp, oa-002.webp ...
-- Luego, en assets/js/productos.js cambia la imagen del perfume:
-  imagen: "assets/img/productos/oa-001.webp"

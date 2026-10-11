@@ -31,13 +31,12 @@ function enlacePerfume(ref) {
 }
 
 function fichaPerfume(p) {
-  return [
-    `*${p.nombre}*`,
-    `Referencia: ${p.ref}`,
-    `Estilo: ${textoEstilo(p.estilo)}`,
-    `Familia: ${textoFamilias(p.familia)}`,
-    `Presentación: ${p.presentacion}`
-  ].join("\n");
+  // Los perfumes que entran solo con la foto todavía no tienen estilo, familia ni presentación
+  const lineas = [`*${p.nombre}*`, `Referencia: ${p.ref}`];
+  if (textoEstilo(p.estilo)) lineas.push(`Estilo: ${textoEstilo(p.estilo)}`);
+  if (textoFamilias(p.familia)) lineas.push(`Familia: ${textoFamilias(p.familia)}`);
+  if (p.presentacion) lineas.push(`Presentación: ${p.presentacion}`);
+  return lineas.join("\n");
 }
 
 function cierre(codigo, seccion, ref) {

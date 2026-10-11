@@ -21,6 +21,15 @@ function buscarPerfume(ref) {
   return PRODUCTOS.find(p => p.ref === ref);
 }
 
+// Estilo y familia del perfume, sin los que estén vacíos
+function etiquetas(p) {
+  return [textoEstilo(p.estilo), textoFamilias(p.familia)].filter(Boolean);
+}
+
+function spans(textos) {
+  return textos.filter(Boolean).map(t => `<span>${escapar(t)}</span>`).join("");
+}
+
 const ESCALA_PERFIL = ["", "Muy baja", "Baja", "Media", "Alta", "Muy alta"];
 const ESCALA_INTENSIDAD = ["", "Suave", "Ligera", "Media", "Intensa", "Muy intensa"];
 
@@ -108,10 +117,7 @@ function tarjeta(p, i) {
         ${etiqueta}
       </div>
       <div class="perfume__info">
-        <p class="perfume__meta">
-          <span>${escapar(textoEstilo(p.estilo))}</span>
-          <span>${escapar(textoFamilias(p.familia))}</span>
-        </p>
+        ${etiquetas(p).length ? `<p class="perfume__meta">${spans(etiquetas(p))}</p>` : ""}
         <h3 class="perfume__nombre">
           <button type="button" data-ref="${p.ref}">${escapar(p.nombre)}</button>
         </h3>
@@ -149,6 +155,7 @@ function abrirDetalle(ref) {
     { id: "fondo", nombre: "Fondo" }
   ];
   const notas = etapas
+    .filter(e => (p.notas || {})[e.id])
     .map(e => medidor(e.nombre, (p.intensidad || {})[e.id], ESCALA_INTENSIDAD, (p.notas || {})[e.id]))
     .join("");
   const perfil = ATRIBUTOS
@@ -161,19 +168,12 @@ function abrirDetalle(ref) {
       <img src="${p.imagen}" alt="Perfume ${escapar(p.nombre)}" width="600" height="750">
     </div>
     <div class="detalle__info">
-      <p class="detalle__tags">
-        <span>${escapar(textoEstilo(p.estilo))}</span>
-        <span>${escapar(textoFamilias(p.familia))}</span>
-        <span>${escapar(p.presentacion)}</span>
-      </p>
+      <p class="detalle__tags">${spans([...etiquetas(p), p.presentacion])}</p>
       <h2 id="detalle-nombre">${escapar(p.nombre)}</h2>
       <p class="detalle__ref">Ref. ${escapar(p.ref)}</p>
-      <p class="detalle__desc">${escapar(p.descripcion)}</p>
+      <p class="detalle__desc">${escapar(p.descripcion || "Escríbenos por WhatsApp y te contamos sus notas, su duración y su presentación.")}</p>
 
-      <div class="detalle__bloque">
-        <h3>Notas e intensidad</h3>
-        ${notas}
-      </div>
+      ${notas ? `<div class="detalle__bloque"><h3>Notas e intensidad</h3>${notas}</div>` : ""}
 
       ${perfil ? `<div class="detalle__bloque"><h3>Cómo se comporta</h3>${perfil}</div>` : ""}
 
@@ -261,11 +261,11 @@ function pintarDestacado() {
         <h2 id="destacado-nombre">${escapar(p.nombre)}</h2>
         <p class="destacado__meta">${escapar(textoEstilo(p.estilo))}, ${escapar(textoFamilias(p.familia).toLowerCase())}</p>
         <p class="destacado__desc">${escapar(p.descripcion)}</p>
-        <dl class="destacado__notas">
+        ${p.notas && p.notas.salida ? `<dl class="destacado__notas">
           <div><dt>Salida</dt><dd>${escapar(p.notas.salida)}</dd></div>
           <div><dt>Corazón</dt><dd>${escapar(p.notas.corazon)}</dd></div>
           <div><dt>Fondo</dt><dd>${escapar(p.notas.fondo)}</dd></div>
-        </dl>
+        </dl>` : ""}
         <div class="destacado__acciones">
           <a class="boton boton--ambar" href="${linkWhatsApp(mensajeCompra(p, "Destacado"))}" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><use href="#icono-chat"/></svg>
@@ -306,7 +306,7 @@ function datosEstructurados() {
         "@type": "Product",
         "name": p.nombre,
         "sku": p.ref,
-        "description": p.descripcion,
+        "description": p.descripcion || undefined,
         "category": "Perfumes " + textoEstilo(p.estilo).toLowerCase(),
         "image": new URL(p.imagen, CONFIG.urlSitio).href,
         "url": CONFIG.urlSitio + "?perfume=" + p.ref,
@@ -321,9 +321,75 @@ function datosEstructurados() {
   document.head.appendChild(script);
 }
 
-// 10. Eventos y arranque
+// 10. Fotos automáticas
+// fotos.js trae la lista de fotos de assets/img/productos/ y se genera solo al publicar.
+// Si la foto se llama igual que un perfume de productos.js, se le asigna a ese perfume.
+// Si no, entra al catálogo como un perfume nuevo que toma el nombre del archivo.
+
+const CARPETA_FOTOS = "assets/img/productos/";
+const SIN_FOTO = "assets/img/placeholder.svg";
+
+// "Al_Noble-Ameer" y "al noble ameer" dan la misma clave
+function clave(texto) {
+  return normalizar(texto).replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function nombreDeFoto(archivo) {
+  const nombre = archivo.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
+  // Si el archivo viene todo en minúsculas, pone mayúscula inicial a cada palabra
+  return nombre === nombre.toLowerCase() ? nombre.replace(/(^|\s)\S/g, l => l.toUpperCase()) : nombre;
+}
+
+function sumarFotos() {
+  if (typeof FOTOS === "undefined") return;
+  const ruta = archivo => CARPETA_FOTOS + encodeURIComponent(archivo);
+  const usadas = new Set();
+
+  PRODUCTOS.forEach(p => {
+    const marca = p.marca || "";
+    const nombres = [p.nombre, marca + " " + p.nombre, p.nombre + " " + marca].map(clave);
+    const propias = FOTOS.filter(f => nombres.includes(clave(nombreDeFoto(f))));
+    propias.forEach(f => usadas.add(f));
+
+    const enCarpeta = (p.imagen || "").startsWith(CARPETA_FOTOS);
+    const actual = enCarpeta ? decodeURIComponent(p.imagen.slice(CARPETA_FOTOS.length)) : "";
+    if (FOTOS.includes(actual)) {
+      usadas.add(actual);
+    } else if (propias.length) {
+      p.imagen = ruta(propias[0]);
+    } else if (enCarpeta || !p.imagen) {
+      // La foto se borró o nunca se puso
+      p.imagen = SIN_FOTO;
+    }
+  });
+
+  const refs = new Set(PRODUCTOS.map(p => p.ref));
+  FOTOS.filter(f => !usadas.has(f)).forEach(f => {
+    const nombre = nombreDeFoto(f);
+    const ref = clave(nombre).replace(/ /g, "-").toUpperCase();
+    // La misma foto en dos formatos cuenta como un solo perfume
+    if (!ref || refs.has(ref)) return;
+    refs.add(ref);
+    PRODUCTOS.push({
+      ref,
+      nombre,
+      estilo: "",
+      familia: [],
+      presentacion: "",
+      descripcion: "",
+      notas: {},
+      imagen: ruta(f),
+      etiqueta: "",
+      destacado: false,
+      disponible: true
+    });
+  });
+}
+
+// 11. Eventos y arranque
 
 document.addEventListener("DOMContentLoaded", () => {
+  sumarFotos();
   const refInicial = leerUrl();
   pintarCinta();
   pintarGuia();

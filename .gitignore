@@ -6,3 +6,9 @@ assets/img/logo-completo.png
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Lista de fotos: se genera sola al publicar
+assets/js/fotos.js
+
+# Ajustes locales de Claude
+.claude/
