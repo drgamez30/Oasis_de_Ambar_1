@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -27,6 +28,20 @@ jobs:
 
       - name: Leer perfumes.xlsx y las fotos
         run: node scripts/generar-datos.js
+
+      # Mientras Pages esté en "Deploy from a branch", GitHub publica también por su cuenta
+      # y pisaría esta publicación. Se espera a que termine para publicar de último.
+      - name: Esperar la publicación propia de GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for intento in 1 2 3; do
+            id=$(gh run list --repo "$GITHUB_REPOSITORY" --commit "$GITHUB_SHA" --json databaseId,name \
+              --jq '[.[] | select(.name == "pages build and deployment")][0].databaseId // empty')
+            if [ -n "$id" ]; then break; fi
+            sleep 5
+          done
+          if [ -n "$id" ]; then gh run watch "$id" --repo "$GITHUB_REPOSITORY" --interval 5 || true; fi
 
       - uses: actions/configure-pages@v5
 
