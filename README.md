@@ -10,6 +10,7 @@ No muestra precios. Es un sitio estático (HTML, CSS y JavaScript): se abre con 
 ```
 Oasis de Ambar/
 ├── index.html                  Página del catálogo (estructura y SEO)
+├── perfumes.xlsx               Los perfumes y sus características (se edita en Excel)
 ├── robots.txt                  Permite a Google recorrer el sitio
 ├── sitemap.xml                 Mapa del sitio para buscadores
 ├── site.webmanifest            Nombre, colores e iconos del sitio
@@ -17,15 +18,15 @@ Oasis de Ambar/
 ├── .github/workflows/
 │   └── publicar.yml            Publica el sitio en GitHub Pages con cada cambio
 ├── scripts/
-│   └── generar-fotos.js        Arma la lista de fotos del catálogo
+│   └── generar-datos.js        Lee perfumes.xlsx y la carpeta de fotos
 └── assets/
     ├── css/
     │   └── styles.css          Diseño esmeralda y ámbar, animaciones, celular y tablet
     ├── fonts/                  Marcellus y Jost (locales, no dependen de internet)
     ├── js/
     │   ├── config.js           Datos del negocio: WhatsApp, Instagram, dominio
-    │   ├── productos.js        Estilos, familias, características y perfumes
-    │   ├── fotos.js            Lista de fotos (se genera sola, no está en el repositorio)
+    │   ├── productos.js        Estilos, familias, características y perfumes de ejemplo
+    │   ├── datos.js            Perfumes del Excel y lista de fotos (se genera solo, no está en el repositorio)
     │   ├── whatsapp.js         Plantillas de los mensajes de WhatsApp
     │   ├── catalogo.js         Filtros, buscador guiado, tarjetas, ficha y SEO
     │   └── animaciones.js      Animaciones al hacer scroll
@@ -42,30 +43,41 @@ Oasis de Ambar/
         └── productos/          Fotos de los perfumes
 ```
 
-## Fotos automáticas
+## Perfumes: Excel y fotos
 
-Cada foto que se sube a `assets/img/productos/` aparece sola en el catálogo, uno o dos minutos después.
+Los perfumes se escriben en `perfumes.xlsx` (hoja **Perfumes**, una fila por perfume) y las fotos se suben a `assets/img/productos/`.
+Al subir cualquiera de los dos a GitHub, el catálogo se actualiza solo en uno o dos minutos.
 
 | Quiero...                                  | Qué hago                 |
 |--------------------------------------------|--------------------------|
-| Agregar un perfume                         | Subo su foto. El nombre del archivo es el nombre del perfume |
-| Quitar un perfume                          | Borro su foto            |
-| Completar la ficha (estilo, familia, notas, barras) | Agrego el perfume en `productos.js` con el mismo nombre; la foto se le asigna sola |
+| Agregar un perfume                         | Agrego una fila en `perfumes.xlsx` y subo su foto |
+| Cambiar notas, barras, estilo o familia    | Edito la fila en `perfumes.xlsx` |
+| Marcar un perfume como agotado             | Columna **Disponible**: No |
+| Elegir el perfume destacado                | Columna **Destacado**: Sí (solo uno) |
+| Quitar un perfume                          | Borro su fila y su foto  |
 
-Al subir un cambio, GitHub ejecuta `.github/workflows/publicar.yml`, que arma la lista de fotos y publica el sitio.
+Cómo se une la foto con su fila:
+
+- Si el archivo se llama igual que el perfume (`Al Noble Ameer.jpg`), se asigna sola.
+- Si se llama distinto, se escribe el nombre exacto del archivo en la columna **Foto**.
+- Una foto que no es de ninguna fila aparece igual, solo con el nombre del archivo.
+
+Para subir el Excel: en GitHub, **Add file → Upload files**, se arrastra `perfumes.xlsx` a la carpeta principal y reemplaza al anterior.
+No hay que cambiar los títulos de la primera fila ni el nombre de la hoja.
+
+Al subir un cambio, GitHub ejecuta `.github/workflows/publicar.yml`, que lee el Excel y las fotos y publica el sitio.
 Para que funcione, en GitHub debe estar elegido **Settings → Pages → Source: GitHub Actions**.
+Si el Excel está dañado, la publicación falla y el sitio se queda como estaba; GitHub avisa por correo.
 
-Para ver las fotos nuevas en tu computador antes de subirlas: `node scripts/generar-fotos.js`.
+Para ver los cambios en tu computador antes de subirlos: `node scripts/generar-datos.js`.
 
 ## Cómo se usa
 
 | Quiero...                                  | Dónde                    |
 |--------------------------------------------|--------------------------|
-| Agregar, quitar o editar perfumes          | `assets/js/productos.js` |
-| Cambiar las barras de un perfume (1 a 5)   | `intensidad` y `perfil` del perfume |
-| Elegir el perfume destacado                | `destacado: true` (solo uno) |
-| Marcar un perfume como agotado             | `disponible: false`      |
-| Poner una etiqueta ("Nuevo", "Edición limitada") | `etiqueta`         |
+| Agregar, quitar o editar perfumes          | `perfumes.xlsx`          |
+| Agregar una familia olfativa o un estilo   | `assets/js/productos.js` |
+| Borrar los perfumes de ejemplo (EJ-)       | `assets/js/productos.js` |
 | Cambiar el texto de los mensajes           | `assets/js/whatsapp.js`  |
 | Cambiar colores                            | `assets/css/styles.css` (sección 2) |
 | Cambiar título y descripción en Google     | `index.html` (bloque SEO) |

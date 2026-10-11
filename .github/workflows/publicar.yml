@@ -1,5 +1,5 @@
 # Publica el sitio en GitHub Pages cada vez que se sube un cambio a main.
-# Antes de publicar arma la lista de fotos, así el catálogo muestra las nuevas sin tocar código.
+# Antes de publicar lee perfumes.xlsx y la carpeta de fotos, así el catálogo se actualiza sin tocar código.
 name: Publicar sitio
 
 on:
@@ -25,8 +25,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Armar la lista de fotos
-        run: node scripts/generar-fotos.js
+      - name: Leer perfumes.xlsx y las fotos
+        run: node scripts/generar-datos.js
 
       - uses: actions/configure-pages@v5
 

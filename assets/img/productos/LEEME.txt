@@ -1,12 +1,15 @@
 Aquí van las fotos de los perfumes.
 
-Cada foto que subas a esta carpeta aparece sola en el catálogo, uno o dos minutos después de subirla.
+Los datos de cada perfume (estilo, familia, notas, barras) se escriben en perfumes.xlsx,
+que está en la carpeta principal. La foto se une sola con su fila:
 
-- El nombre del archivo es el nombre del perfume: "Ishq Al Shuyukh Gold.jpg" se muestra como "Ishq Al Shuyukh Gold".
-  Los guiones también cuentan como espacios: "khamrah-qahwa.webp" se muestra como "Khamrah Qahwa".
-- Si borras la foto, el perfume sale del catálogo.
-- Para ponerle estilo, familia, notas y barras, agrega el perfume en assets/js/productos.js con el mismo nombre.
-  La foto se le asigna sola; no hace falta escribir la ruta de la imagen.
+- Si el archivo se llama igual que el perfume, no hay que hacer nada más:
+  "Al Noble Ameer.jpg" va con la fila "Al Noble Ameer". Los guiones cuentan como espacios.
+- Si se llama distinto, escribe el nombre exacto del archivo en la columna Foto del Excel.
+- Una foto que no es de ninguna fila aparece igual en el catálogo, solo con el nombre del archivo.
+- Si borras la foto, ese perfume queda con la imagen temporal (o sale del catálogo si no tenía fila).
+
+Los cambios se ven en la página uno o dos minutos después de subirlos.
 
 Recomendaciones:
 - Formato .webp o .jpg, proporción vertical 4:5 (por ejemplo 800 x 1000 px).

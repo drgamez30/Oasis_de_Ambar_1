@@ -321,10 +321,11 @@ function datosEstructurados() {
   document.head.appendChild(script);
 }
 
-// 10. Fotos automáticas
-// fotos.js trae la lista de fotos de assets/img/productos/ y se genera solo al publicar.
-// Si la foto se llama igual que un perfume de productos.js, se le asigna a ese perfume.
-// Si no, entra al catálogo como un perfume nuevo que toma el nombre del archivo.
+// 10. Perfumes del Excel y fotos automáticas
+// datos.js se genera solo al publicar. Trae EXCEL (las filas de perfumes.xlsx)
+// y FOTOS (los archivos de assets/img/productos/).
+// Si la foto se llama igual que un perfume, se le asigna a ese perfume.
+// Si no es de ninguno, entra al catálogo como un perfume nuevo que toma el nombre del archivo.
 
 const CARPETA_FOTOS = "assets/img/productos/";
 const SIN_FOTO = "assets/img/placeholder.svg";
@@ -338,6 +339,54 @@ function nombreDeFoto(archivo) {
   const nombre = archivo.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
   // Si el archivo viene todo en minúsculas, pone mayúscula inicial a cada palabra
   return nombre === nombre.toLowerCase() ? nombre.replace(/(^|\s)\S/g, l => l.toUpperCase()) : nombre;
+}
+
+function refDeNombre(nombre) {
+  return clave(nombre).replace(/ /g, "-").toUpperCase();
+}
+
+// Convierte una fila del Excel ("Para él", "Ambarada, Amaderada", "Sí") en un perfume del catálogo
+function perfumeDeExcel(fila) {
+  const idDe = (lista, texto) =>
+    (lista.find(x => clave(x.nombre) === clave(texto) || x.id === clave(texto)) || {}).id;
+  const numero = valor => Math.max(0, Math.min(5, Math.round(Number(valor)) || 0));
+  const es = (valor, opciones) => opciones.includes(clave(valor || ""));
+
+  return {
+    ref: fila.ref || refDeNombre(fila.nombre),
+    nombre: fila.nombre,
+    marca: fila.marca || "",
+    estilo: idDe(ESTILOS, fila.estilo || "") || "",
+    familia: (fila.familia || "").split(/[,;/]/).map(t => idDe(FAMILIAS, t)).filter(Boolean),
+    presentacion: fila.presentacion || "",
+    descripcion: fila.descripcion || "",
+    notas: { salida: fila.salida || "", corazon: fila.corazon || "", fondo: fila.fondo || "" },
+    intensidad: {
+      salida: numero(fila.intensidadSalida),
+      corazon: numero(fila.intensidadCorazon),
+      fondo: numero(fila.intensidadFondo)
+    },
+    perfil: {
+      duracion: numero(fila.duracion),
+      estela: numero(fila.estela),
+      dulzor: numero(fila.dulzor),
+      frescura: numero(fila.frescura)
+    },
+    imagen: fila.foto ? CARPETA_FOTOS + fila.foto : "",
+    etiqueta: fila.etiqueta || "",
+    destacado: es(fila.destacado, ["si", "x", "1"]),
+    // Vacío cuenta como disponible
+    disponible: !es(fila.disponible, ["no", "agotado", "0"])
+  };
+}
+
+// Los perfumes del Excel van primero y reemplazan a los de productos.js con la misma referencia o nombre
+function sumarExcel() {
+  if (typeof EXCEL === "undefined") return;
+  const nuevos = EXCEL.map(perfumeDeExcel);
+  const repetido = p => nuevos.some(n => n.ref === p.ref || clave(n.nombre) === clave(p.nombre));
+  const propios = PRODUCTOS.filter(p => !repetido(p));
+  PRODUCTOS.splice(0, PRODUCTOS.length, ...nuevos, ...propios);
 }
 
 function sumarFotos() {
@@ -355,6 +404,7 @@ function sumarFotos() {
     const actual = enCarpeta ? decodeURIComponent(p.imagen.slice(CARPETA_FOTOS.length)) : "";
     if (FOTOS.includes(actual)) {
       usadas.add(actual);
+      p.imagen = ruta(actual);
     } else if (propias.length) {
       p.imagen = ruta(propias[0]);
     } else if (enCarpeta || !p.imagen) {
@@ -366,7 +416,7 @@ function sumarFotos() {
   const refs = new Set(PRODUCTOS.map(p => p.ref));
   FOTOS.filter(f => !usadas.has(f)).forEach(f => {
     const nombre = nombreDeFoto(f);
-    const ref = clave(nombre).replace(/ /g, "-").toUpperCase();
+    const ref = refDeNombre(nombre);
     // La misma foto en dos formatos cuenta como un solo perfume
     if (!ref || refs.has(ref)) return;
     refs.add(ref);
@@ -389,6 +439,7 @@ function sumarFotos() {
 // 11. Eventos y arranque
 
 document.addEventListener("DOMContentLoaded", () => {
+  sumarExcel();
   sumarFotos();
   const refInicial = leerUrl();
   pintarCinta();

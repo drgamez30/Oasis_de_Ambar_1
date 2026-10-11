@@ -23,7 +23,8 @@ const ATRIBUTOS = [
 ];
 
 // 4. Perfumes
-// Los que tienen referencia EJ- son de ejemplo: bórralos cuando cargues los reales.
+// Los perfumes reales se escriben en perfumes.xlsx (carpeta principal) y entran solos al publicar.
+// Los de aquí con referencia EJ- son de ejemplo: bórralos cuando el Excel tenga los reales.
 // ref: código único
 // marca: casa del perfume (opcional)
 // estilo: id de ESTILOS
@@ -35,22 +36,6 @@ const ATRIBUTOS = [
 // destacado: false para mostrarlo en la sección "Perfume destacado" (solo uno)
 // disponible: false lo muestra como agotado
 const PRODUCTOS = [
-  {
-    ref: "OA-001",
-    nombre: "Al Noble Ameer",
-    marca: "Lattafa",
-    estilo: "unisex",
-    familia: ["ambarada", "amaderada"],
-    presentacion: "100 ml",
-    descripcion: "Especiado y amaderado, con oud y clavo sobre un toque de manzana y pimienta rosa. Elegante para la noche y las ocasiones especiales.",
-    notas: { salida: "Pimienta rosa, manzana, romero", corazon: "Clavo, notas florales", fondo: "Oud, ládano, pachulí, vetiver, ciprés" },
-    intensidad: { salida: 3, corazon: 4, fondo: 5 },
-    perfil: { duracion: 4, estela: 4, dulzor: 2, frescura: 2 },
-    imagen: "assets/img/productos/lattafa-al-noble-ameer.webp",
-    etiqueta: "Nuevo",
-    destacado: true,
-    disponible: true
-  },
   {
     ref: "EJ-001",
     nombre: "Ámbar Nocturno",

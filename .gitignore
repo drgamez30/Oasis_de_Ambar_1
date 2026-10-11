@@ -7,8 +7,11 @@ Thumbs.db
 desktop.ini
 .DS_Store
 
-# Lista de fotos: se genera sola al publicar
-assets/js/fotos.js
+# Perfumes del Excel y lista de fotos: se genera solo al publicar
+assets/js/datos.js
+
+# Archivo temporal que crea Excel mientras perfumes.xlsx está abierto
+~$*.xlsx
 
 # Ajustes locales de Claude
 .claude/
