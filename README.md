@@ -66,7 +66,7 @@ Para subir el Excel: en GitHub, **Add file → Upload files**, se arrastra `perf
 No hay que cambiar los títulos de la primera fila ni el nombre de la hoja.
 
 Al subir un cambio, GitHub ejecuta `.github/workflows/publicar.yml`, que lee el Excel y las fotos y publica el sitio.
-Para que funcione, en GitHub debe estar elegido **Settings → Pages → Source: GitHub Actions**.
+Funciona con cualquier opción de **Settings → Pages → Source**; con **GitHub Actions** la publicación tarda menos.
 Si el Excel está dañado, la publicación falla y el sitio se queda como estaba; GitHub avisa por correo.
 
 Para ver los cambios en tu computador antes de subirlos: `node scripts/generar-datos.js`.
